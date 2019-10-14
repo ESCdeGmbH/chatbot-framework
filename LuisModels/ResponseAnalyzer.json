@@ -1,0 +1,83 @@
+{
+  "luis_schema_version": "5.0.0",
+  "versionId": "0.1",
+  "name": "DialogHelpers-EN",
+  "desc": "",
+  "culture": "en-us",
+  "tokenizerVersion": "1.0.0",
+  "intents": [
+    {
+      "name": "Cancel"
+    },
+    {
+      "name": "None"
+    },
+    {
+      "name": "YesOrNo"
+    }
+  ],
+  "entities": [],
+  "composites": [],
+  "closedLists": [
+    {
+      "name": "Indicator",
+      "subLists": [
+        {
+          "canonicalForm": "yes",
+          "list": [
+            "true",
+            "yeah",
+            "ok"
+          ]
+        },
+        {
+          "canonicalForm": "no",
+          "list": [
+            "false",
+            "nope"
+          ]
+        }
+      ],
+      "roles": []
+    }
+  ],
+  "patternAnyEntities": [],
+  "regex_entities": [],
+  "prebuiltEntities": [],
+  "model_features": [],
+  "regex_features": [],
+  "patterns": [],
+  "utterances": [
+    {
+      "text": "cancel",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "no",
+      "intent": "YesOrNo",
+      "entities": []
+    },
+    {
+      "text": "ok",
+      "intent": "YesOrNo",
+      "entities": []
+    },
+    {
+      "text": "reset",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "stop",
+      "intent": "Cancel",
+      "entities": []
+    },
+    {
+      "text": "yes",
+      "intent": "YesOrNo",
+      "entities": []
+    }
+  ],
+  "settings": []
+}

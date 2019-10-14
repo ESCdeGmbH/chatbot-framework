@@ -1,0 +1,54 @@
+{
+  "luis_schema_version": "5.0.0",
+  "versionId": "0.1",
+  "name": "QuestionTypes-EN",
+  "desc": "Classification of Questions",
+  "culture": "en-us",
+  "tokenizerVersion": "1.0.0",
+  "intents": [
+    {
+      "name": "How"
+    },
+    {
+      "name": "HowMany"
+    },
+    {
+      "name": "None"
+    },
+    {
+      "name": "What"
+    },
+    {
+      "name": "Where"
+    },
+    {
+      "name": "Who"
+    },
+    {
+      "name": "Why"
+    }
+  ],
+  "entities": [],
+  "composites": [],
+  "closedLists": [],
+  "patternAnyEntities": [],
+  "regex_entities": [],
+  "prebuiltEntities": [],
+  "model_features": [],
+  "regex_features": [],
+  "patterns": [],
+  "utterances": [
+    {
+      "text": "where are you from",
+      "intent": "Where",
+      "entities": []
+    },
+    {
+      "text": "how are you",
+      "intent": "How",
+      "entities": []
+    },
+    
+  ],
+  "settings": []
+}
