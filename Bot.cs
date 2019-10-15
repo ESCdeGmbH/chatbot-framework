@@ -81,14 +81,14 @@ namespace Framework
         /// <summary>
         /// The instances of stateful dialogs.
         /// </summary>
-        protected readonly List<D> DialogInstances;
+        protected readonly List<BaseDialog<B,S>> DialogInstances;
 
         /// <summary>
         /// Load all dialogs.
         /// </summary>
         /// <param name="dialogs">The dialog set.</param>
         /// <param name="instances">The stateful dialogs.</param>
-        protected abstract void LoadDialogs(out DialogSet dialogs, out List<D> instances);
+        protected abstract void LoadDialogs(out DialogSet dialogs, out List<BaseDialog<B, S>> instances);
 
         /// <summary>
         /// Returns a Luis handler which starts a dialog.
