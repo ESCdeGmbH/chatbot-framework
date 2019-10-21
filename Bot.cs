@@ -115,7 +115,35 @@ namespace Framework
         /// <param name="dialogContext">The dialog context.</param>
         /// <param name="dialogResult">The dialog result.</param>
         /// <returns>An execution.</returns>
-        protected abstract Task HandleDialogResult(ITurnContext ctx, CancellationToken cancellationToken, DialogContext dialogContext, DialogTurnResult dialogResult);
+        protected virtual async Task HandleDialogResult(ITurnContext ctx, CancellationToken cancellationToken, DialogContext dialogContext, DialogTurnResult dialogResult)
+        {
+            switch (dialogResult.Status)
+            {
+                case DialogTurnStatus.Empty:
+                    DialogInstances.ForEach(d => d.Reset());
+                    await SelectTopic(ctx, cancellationToken);
+                    break;
+                case DialogTurnStatus.Complete:
+                    await dialogContext.EndDialogAsync();
+                    DialogInstances.ForEach(d => d.Reset());
+                    break;
+                case DialogTurnStatus.Cancelled:
+                    await dialogContext.CancelAllDialogsAsync();
+                    DialogInstances.ForEach(d => d.Reset());
+                    break;
+                case DialogTurnStatus.Waiting:
+                    break;
+            }
+            await State.SaveChangesAsync(ctx, cancellationToken: cancellationToken);
+        }
+
+        /// <summary>
+        /// Select topic and run dialog.
+        /// </summary>
+        /// <param name="ctx">the context</param>
+        /// <param name="cancellationToken">the cancellation token</param>
+        /// <returns>indicator of success</returns>
+        protected abstract Task<bool> SelectTopic(ITurnContext ctx, CancellationToken cancellationToken);
 
         protected abstract override Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken);
 
