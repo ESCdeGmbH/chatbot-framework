@@ -81,7 +81,7 @@ namespace Framework
         /// <summary>
         /// The instances of stateful dialogs.
         /// </summary>
-        protected readonly List<BaseDialog<B,S>> DialogInstances;
+        protected readonly List<BaseDialog<B, S>> DialogInstances;
 
         /// <summary>
         /// Load all dialogs.
@@ -116,6 +116,15 @@ namespace Framework
         /// <param name="dialogResult">The dialog result.</param>
         /// <returns>An execution.</returns>
         protected abstract Task HandleDialogResult(ITurnContext ctx, CancellationToken cancellationToken, DialogContext dialogContext, DialogTurnResult dialogResult);
+
+        protected abstract override Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken);
+
+        protected virtual async Task HandleDialog(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+        {
+            var dialogContext = await Dialogs.CreateContextAsync(turnContext);
+            var dialogResult = await dialogContext.ContinueDialogAsync();
+            await HandleDialogResult(turnContext, cancellationToken, dialogContext, dialogResult);
+        }
 
         #region SendMessage
 
