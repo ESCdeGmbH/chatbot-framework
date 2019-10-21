@@ -69,7 +69,7 @@ namespace Framework.Dialogs.Smalltalk
 
             if (files.Count == 1)
             {
-                string path = Path.Combine(SmallTalkPath, files[0]);
+                string path = Path.Combine(SmallTalkPath, $"{files[0]}.json");
                 return JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(path));
             }
 

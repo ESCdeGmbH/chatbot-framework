@@ -16,8 +16,8 @@ namespace Framework
         protected BotServices(IConfiguration configuration, Language language)
         {
             Configuration = configuration;
-            ResponseAnalyzer = new ResponseAnalyzer.Analyzer(configuration, language);
-            QuestionAnalyzer = new QuestionAnalyzer.Analyzer(configuration, language);
+            ResponseAnalyzer = configuration.GetSection("ResponseAnalyzer").Exists() ? new ResponseAnalyzer.Analyzer(configuration, language) : null;
+            QuestionAnalyzer = configuration.GetSection("QuestionAnalyzer").Exists() ? new QuestionAnalyzer.Analyzer(configuration, language) : null;
         }
 
         /// <summary>
