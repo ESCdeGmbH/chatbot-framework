@@ -1,4 +1,5 @@
 ﻿using Framework.Dialogs;
+using Framework.Luis;
 using Framework.Misc;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
@@ -45,6 +46,23 @@ namespace Framework
         /// The Luis handlers (maps intents(lower case) to handler).
         /// </summary>
         protected readonly Dictionary<string, Handler> LuisHandlers;
+        /// <summary>
+        /// The main classifier Luis instance.
+        /// </summary>
+        protected CombinedLuisRecognizer _recognizer;
+
+        /// <summary>
+        /// The result of classification with highest score included.
+        /// </summary>
+        public RecognizerResult Result => _recognizer?.GetResult();
+
+        /// <summary>
+        /// The detected entities.
+        /// </summary>
+        /// <param name="cleanup">Indicator for cleanup (e.g. remove match to group if you are asking for resource group).</param>
+        /// <returns>All detected entities by entity-definitions.</returns>
+        public Dictionary<string, List<JToken>> GetEntities(bool cleanup = true) => _recognizer?.GetEntities(cleanup);
+
 
         /// <summary>
         /// Creates a new bot.
@@ -195,7 +213,7 @@ namespace Framework
         {
             return await ctx.SendActivityAsync(activity);
         }
-
+        
         #endregion
     }
 }
