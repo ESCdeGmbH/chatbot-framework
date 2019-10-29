@@ -117,56 +117,69 @@ namespace Framework.Luis
                 return new Dictionary<string, List<JToken>>();
 
 
-            var allInstances = entities.GetValue("$instance").ToObject<Dictionary<string, List<LuisLoader>>>();
-            var result = new Dictionary<string, List<JToken>>();
-            allInstances.Keys.ToList().ForEach(k => result.Add(k, new List<JToken>()));
+            var mapType2Data = entities.GetValue("$instance").ToObject<Dictionary<string, List<LuisLoader>>>();
 
-            foreach (var instance in allInstances)
+            foreach (var entityType in mapType2Data.Keys)
             {
-                entities.TryGetValue(instance.Key, out JToken resolution);
+                entities.TryGetValue(entityType, out JToken resolution);
+
                 JToken[] reses = resolution.Children().ToArray() ?? new JToken[0];
-                result[instance.Key].AddRange(reses);
-                var distinct = result[instance.Key].Distinct().ToList();
-                result[instance.Key].Clear();
-                result[instance.Key].AddRange(distinct);
+                List<LuisLoader> entitiesFromLuis = mapType2Data[entityType];
+                if (reses.Length != entitiesFromLuis.Count)
+                {
+                    // Shall not happen ..
+                    continue;
+                }
+
+                for (int i = 0; i < reses.Length; i++)
+                    entitiesFromLuis[i].Resolution = reses[i];
             }
 
             if (cleanup)
-                Cleanup(result);
+                return Cleanup(mapType2Data);
 
+
+            Dictionary<string, List<JToken>> result = new Dictionary<string, List<JToken>>();
+            foreach (var key in mapType2Data.Keys)
+                result.Add(key, mapType2Data[key].ConvertAll(d => d.Resolution));
             return result;
         }
 
-        private static void Cleanup(Dictionary<string, List<JToken>> result)
+        private static Dictionary<string, List<JToken>> Cleanup(Dictionary<string, List<LuisLoader>> rawData)
         {
-            foreach (string key in result.Keys.ToList())
+            Dictionary<string, List<JToken>> result = new Dictionary<string, List<JToken>>();
+            foreach (string key in rawData.Keys)
             {
-                var value = result[key].ToList();
-                if (value.Count == 0)
+                List<LuisLoader> value = rawData[key].ToList();
+                if (value.Count == 0 || value[0].Resolution == null)
                     continue;
                 var example = value[0];
-                if (example.Type != JTokenType.Array)
+                if (example.Resolution.Type != JTokenType.Array)
                 {
                     continue;
                 }
 
-                // Sort by Array
-                var asArray = value.ConvertAll(e => e.ToObject<object[]>());
-                if (asArray.Any(a => a.Length != 1))
+                if (value.Any(a => a.Resolution.ToObject<object[]>().Length != 1))
                 {
                     // Not each one element ..
                     continue;
                 }
 
-                value.Sort((e1, e2) => e2.ToObject<object[]>()[0].ToString().Length - e1.ToObject<object[]>()[0].ToString().Length);
+                value.Sort((e1, e2) => e2.Text.Length - e1.Text.Length);
                 List<JToken> newValue = new List<JToken>();
-                foreach (JToken v in value)
+                List<string> texts = new List<string>();
+                foreach (LuisLoader v in value)
                 {
-                    if (!newValue.Any(nv => nv.ToObject<object[]>()[0].ToString().Contains(v.ToObject<object[]>()[0].ToString())))
-                        newValue.Add(v);
+                    if (texts.Any(nt => nt.Contains(v.Text)))
+                        continue;
+                    newValue.Add(v.Resolution);
+                    texts.Add(v.Text);
                 }
-                result[key] = newValue;
+
+                result.Add(key, newValue);
             }
+
+            return result;
         }
 
         [Serializable]
@@ -180,6 +193,7 @@ namespace Framework.Luis
             public string Text { get; set; }
             [JsonProperty("type")]
             public string Type { get; set; }
+            public JToken Resolution { get; set; }
         }
     }
 }
