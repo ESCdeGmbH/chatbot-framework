@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -26,18 +27,13 @@ namespace Framework.ResponseAnalyzer
         private string _response;
 
         private readonly List<string> _blackList;
-
-
-        private static readonly Dictionary<Language, List<string>> BlackLists = new Dictionary<Language, List<string>> {
-            { Language.English, new List<string> { "the" } },
-            { Language.Deutsch, new List<string> { "der", "die", "das", "wer", "wie", "was", "für", "in", "und", "oder", "als", "mit", "ich", "von", "vom", "er", "sie", "es", "wir", "ihr", "du", "man", "mithilfe", "beim", "bei", "dem", "den", "dessen", "welchen", "wessen", "wann", "ist" } },
-        };
-
+        private static readonly string BlackListPath = RootPath.GetRootPath("Framework", "ResponseAnalyzer", "Blacklist.json");
 
         private static readonly Dictionary<Language, string> Configs = new Dictionary<Language, string> {
             { Language.English, "en" },
             { Language.Deutsch, "de" }
         };
+        
 
         /// <summary>
         /// Creates the analyzer.
@@ -51,7 +47,7 @@ namespace Framework.ResponseAnalyzer
             if (!Configs.ContainsKey(lang))
                 throw new ArgumentException("Your Language is not supported.");
 
-            _blackList = BlackLists[lang];
+            _blackList = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(File.ReadAllText(BlackListPath))[Configs[lang]];
 
             var map = config.GetSection("ResponseAnalyzer").GetSection(Configs[lang]).Get<Dictionary<string, object>>();
             LuisServiceDefinition lsd = JsonConvert.DeserializeObject<LuisServiceDefinition>(JsonConvert.SerializeObject(map));

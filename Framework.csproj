@@ -19,4 +19,10 @@
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.5.1" />
     <PackageReference Include="Microsoft.Graph" Version="1.16.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ResponseAnalyzer\Blacklist.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
