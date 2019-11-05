@@ -165,7 +165,7 @@ namespace Framework
 
         protected abstract override Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken);
 
-        protected virtual async Task HandleDialog(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+        protected virtual async Task HandleDialog(ITurnContext turnContext, CancellationToken cancellationToken)
         {
             var dialogContext = await Dialogs.CreateContextAsync(turnContext);
             var dialogResult = await dialogContext.ContinueDialogAsync();
