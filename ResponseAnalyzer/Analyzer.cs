@@ -118,7 +118,7 @@ namespace Framework.ResponseAnalyzer
         {
             List<Tuple<T, float>> result = new List<Tuple<T, float>>();
 
-            var split = Regex.Matches(_response, "[A-Za-z0-9äöüÄÖÜß_\\.]+");
+            var split = Regex.Matches(_response, "[A-Za-z0-9äöüÄÖÜß_\\-\\.]+");
             var tokens = split.Select(t => t.Value).Where(t => !_blackList.Any(b => b.ToLower() == t.ToLower())).ToList();
 
             float max = 0;
