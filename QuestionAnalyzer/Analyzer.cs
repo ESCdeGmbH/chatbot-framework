@@ -82,8 +82,9 @@ namespace Framework.QuestionAnalyzer
         /// <param name="who">The handler for "who" questions.</param>
         /// <param name="why">The handler for "why" questions.</param>
         /// <param name="when">The handler for "when" questions.</param>
+        /// <param name="howLong">The handler for "how long" questions.</param>
         /// <returns></returns>
-        public async Task HandleQuestion(Action none, Action how = null, Action howMany = null, Action what = null, Action where = null, Action who = null, Action why = null, Action when = null)
+        public async Task HandleQuestion(Action none, Action how = null, Action howMany = null, Action what = null, Action where = null, Action who = null, Action why = null, Action when = null, Action howLong = null)
         {
             if (none == null)
                 throw new ArgumentNullException(nameof(none));
@@ -99,6 +100,7 @@ namespace Framework.QuestionAnalyzer
                 { QuestionType.Who, who },
                 { QuestionType.Why, why },
                 { QuestionType.When, when },
+                { QuestionType.HowLong, howLong },
             };
 
             if (!handlers.TryGetValue(types, out Action handler))

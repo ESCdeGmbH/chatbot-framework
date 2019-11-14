@@ -5,6 +5,6 @@
     /// </summary>
     public enum QuestionType
     {
-        How, HowMany, None, What, Where, Who, Why, When
+        How, HowMany, None, What, Where, Who, Why, When, HowLong,
     }
 }
