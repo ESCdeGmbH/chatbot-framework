@@ -134,10 +134,8 @@ namespace Framework.ResponseAnalyzer
                     max = Math.Max(max, val);
                 }
             }
-            if (result.Count(t => t.Item2 == max) == 1)
-                return new List<T> { result.Find(t => t.Item2 == max).Item1 };
 
-            return result.ConvertAll(t => t.Item1);
+            return result.FindAll(t => t.Item2 == max).ConvertAll(t => t.Item1);
         }
 
         private float StringMentioned(List<string> tokens, List<string> stringsToMatch, bool matchAllValues)
