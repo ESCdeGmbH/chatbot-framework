@@ -105,6 +105,10 @@ namespace Framework.ResponseAnalyzer
 
 
         #region Options
+
+        private Regex _splitter = new Regex("[A-Za-z0-9äöüÄÖÜß_\\.]+");
+        private Regex _cleaner = new Regex("[^A-Za-z0-9äöüÄÖÜß]+");
+
         /// <summary>
         /// Classifies wheter objects have been mentioned in the response.
         /// </summary>
@@ -118,14 +122,16 @@ namespace Framework.ResponseAnalyzer
         {
             List<Tuple<T, float>> result = new List<Tuple<T, float>>();
 
-            var split = Regex.Matches(_response.Replace('-', ' '), "[A-Za-z0-9äöüÄÖÜß_\\-\\.]+");
+            var split = _splitter.Matches(_response.Replace('-', ' '));
             var tokens = split.Select(t => t.Value).Where(t => !_blackList.Any(b => b.ToLower() == t.ToLower())).Distinct().ToList();
 
             float max = 0;
 
             foreach (var obj in objects)
             {
-                var vals = objToValues(obj).SelectMany(s => s.Split('-')).Distinct().ToList();
+                var vals = objToValues(obj).SelectMany(s => s.Split('-')).ToList();
+                vals = vals.Select(t => _cleaner.Replace(t, "")).Distinct().ToList();
+
                 float val;
 
                 if ((val = StringMentioned(tokens, vals, matchAllValues)) > 0)
@@ -190,7 +196,8 @@ namespace Framework.ResponseAnalyzer
             option = option.ToLower();
             part = part.ToLower();
 
-            if (option.Length > 3 && part.Length > 3 && option.Contains(part))
+
+            if (option.Length >= 3 && part.Length >= 3 && option.Contains(part))
                 return 1;
 
 
