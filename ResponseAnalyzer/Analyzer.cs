@@ -33,7 +33,7 @@ namespace Framework.ResponseAnalyzer
             { Language.English, "en" },
             { Language.Deutsch, "de" }
         };
-        
+
 
         /// <summary>
         /// Creates the analyzer.
@@ -118,14 +118,14 @@ namespace Framework.ResponseAnalyzer
         {
             List<Tuple<T, float>> result = new List<Tuple<T, float>>();
 
-            var split = Regex.Matches(_response, "[A-Za-z0-9äöüÄÖÜß_\\-\\.]+");
+            var split = Regex.Matches(_response.Replace('-', ' '), "[A-Za-z0-9äöüÄÖÜß_\\-\\.]+");
             var tokens = split.Select(t => t.Value).Where(t => !_blackList.Any(b => b.ToLower() == t.ToLower())).ToList();
 
             float max = 0;
 
             foreach (var obj in objects)
             {
-                var vals = objToValues(obj);
+                var vals = objToValues(obj).SelectMany(s => s.Split('-')).ToList();
                 float val;
 
                 if ((val = StringMentioned(tokens, vals, matchAllValues)) > 0)
