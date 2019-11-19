@@ -27,6 +27,6 @@ namespace Framework
         /// <summary>
         /// The question analyzer for all dialogs.
         /// </summary>
-        public QuestionAnalyzer.Analyzer QuestionAnalyzer { get; protected set; }
+        public QuestionAnalyzer.AnalyzerBase QuestionAnalyzer { get; protected set; }
     }
 }
