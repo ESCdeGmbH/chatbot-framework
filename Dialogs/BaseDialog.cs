@@ -24,7 +24,7 @@ namespace Framework.Dialogs
         /// <summary>
         /// The question analyzer for this dialog.
         /// </summary>
-        protected readonly QuestionAnalyzer.Analyzer QuestionAnalyzer;
+        protected readonly QuestionAnalyzer.AnalyzerBase QuestionAnalyzer;
 
         /// <summary>
         /// Configure the BaseDialog.
