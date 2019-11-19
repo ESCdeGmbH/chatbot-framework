@@ -33,7 +33,7 @@ namespace Framework.QuestionAnalyzer
         /// <param name="lang">Defines the language.</param>
         /// <param name="threshold">The default threshold for Luis classification.</param>
         /// <exception cref="ArgumentException">unsupported language.</exception>
-        public Analyzer(IConfiguration config, Language lang, double threshold = 0.7)
+        public Analyzer(IConfiguration config, Language lang, double threshold)
         {
             if (!Configs.ContainsKey(lang))
                 throw new ArgumentException("Your Language is not supported.");
@@ -111,22 +111,27 @@ namespace Framework.QuestionAnalyzer
             handler();
         }
 
-        private static QuestionType GetMaximialIntents(List<Tuple<QuestionType, double>> _this)
+        /// <summary>
+        /// Determines the top scoring of all questiontypes.
+        /// </summary>
+        /// <param name="foundTypes">The types from the classifier.</param>
+        /// <returns>The most likely type.</returns>
+        public static QuestionType GetMaximialIntents(List<Tuple<QuestionType, double>> foundTypes)
         {
-            if (_this.Count == 0)
+            if (foundTypes.Count == 0)
                 return QuestionType.None;
 
 
-            QuestionType maxKey = _this[0].Item1;
-            double maxValue = _this[0].Item2;
+            QuestionType maxKey = foundTypes[0].Item1;
+            double maxValue = foundTypes[0].Item2;
 
 
-            for (int i = 0; i < _this.Count; i++)
+            for (int i = 0; i < foundTypes.Count; i++)
             {
-                if (_this[i].Item2 > maxValue)
+                if (foundTypes[i].Item2 > maxValue)
                 {
-                    maxKey = _this[i].Item1;
-                    maxValue = _this[i].Item2;
+                    maxKey = foundTypes[i].Item1;
+                    maxValue = foundTypes[i].Item2;
                 }
             }
 

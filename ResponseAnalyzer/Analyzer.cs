@@ -42,7 +42,7 @@ namespace Framework.ResponseAnalyzer
         /// <param name="lang">Defines the language.</param>
         /// <param name="threshold">The default threshold for Luis classification.</param>
         /// <exception cref="ArgumentException">unsupported language.</exception>
-        public Analyzer(IConfiguration config, Language lang, double threshold = 0.7)
+        public Analyzer(IConfiguration config, Language lang, double threshold)
         {
             if (!Configs.ContainsKey(lang))
                 throw new ArgumentException("Your Language is not supported.");
@@ -209,7 +209,7 @@ namespace Framework.ResponseAnalyzer
                 // Levensthein:
                 int distance = Levensthein(part, option);
                 float normalized = distance / (float)Math.Max(option.Length, part.Length);
-                result = normalized < 0.4;
+                result = normalized < 0.3;
             }
 
 

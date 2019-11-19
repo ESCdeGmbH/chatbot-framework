@@ -13,11 +13,13 @@ namespace Framework
         /// </summary>
         /// <param name="configuration">The configuration of the bot.</param>
         /// <param name="language">The language to be used.</param>
-        protected BotServices(IConfiguration configuration, Language language)
+        /// <param name="thresholdQuestionAnalyzer">The threshold for the question analyzer. Will be ignored, if configuration is not loaded.</param>
+        /// <param name="thresholdResponseAnalyzer">The threshold for the response analyzer. Will be ignored, if configuration is not loaded.</param>
+        protected BotServices(IConfiguration configuration, Language language, double thresholdResponseAnalyzer, double thresholdQuestionAnalyzer)
         {
             Configuration = configuration;
-            ResponseAnalyzer = configuration.GetSection("ResponseAnalyzer").Exists() ? new ResponseAnalyzer.Analyzer(configuration, language) : null;
-            QuestionAnalyzer = configuration.GetSection("QuestionAnalyzer").Exists() ? new QuestionAnalyzer.Analyzer(configuration, language) : null;
+            QuestionAnalyzer = configuration.GetSection("QuestionAnalyzer").Exists() ? new QuestionAnalyzer.Analyzer(configuration, language, thresholdQuestionAnalyzer) : null;
+            ResponseAnalyzer = configuration.GetSection("ResponseAnalyzer").Exists() ? new ResponseAnalyzer.Analyzer(configuration, language, thresholdResponseAnalyzer) : null;
         }
 
         /// <summary>
