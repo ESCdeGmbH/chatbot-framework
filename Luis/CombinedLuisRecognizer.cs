@@ -26,7 +26,7 @@ namespace Framework.Luis
 
         public async Task Recognize(ITurnContext context, CancellationToken cancellationToken)
         {
-            _resultWithCorrection = await _withCorrection?.RecognizeAsync(context, cancellationToken);
+            _resultWithCorrection = await (_withCorrection?.RecognizeAsync(context, cancellationToken) ?? Task.FromResult<RecognizerResult>(null));
             _resultWithoutCorrection = await _withoutCorrection.RecognizeAsync(context, cancellationToken);
         }
 
