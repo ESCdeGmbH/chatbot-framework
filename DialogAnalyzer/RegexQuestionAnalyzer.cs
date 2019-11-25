@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Framework.QuestionAnalyzer
+namespace Framework.DialogAnalyzer
 {
-    public class RegexAnalyzer : AnalyzerBase
+    public class RegexQuestionAnalyzer : QuestionAnalyzer
     {
         private List<Tuple<QuestionType, double>> _result;
 
@@ -20,7 +20,7 @@ namespace Framework.QuestionAnalyzer
         /// </summary>
         /// <param name="lang">Defines the language.</param>
         /// <exception cref="ArgumentException">unsupported language.</exception>
-        public RegexAnalyzer(Language lang)
+        public RegexQuestionAnalyzer(Language lang)
         {
             if (!Configs.Contains(lang))
                 throw new ArgumentException("Your Language is not supported.");
@@ -61,11 +61,6 @@ namespace Framework.QuestionAnalyzer
                 _result.Add(new Tuple<QuestionType, double>(QuestionType.Why, 1));
             else if (what.Any(h => text.StartsWith($"{h} ")))
                 _result.Add(new Tuple<QuestionType, double>(QuestionType.What, 1));
-            
-
-
-            if (text.StartsWith("wie lange "))
-                _result.Add(new Tuple<QuestionType, double>(QuestionType.How, 1));
         }
     }
 }

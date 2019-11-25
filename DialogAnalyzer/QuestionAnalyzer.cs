@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Framework.QuestionAnalyzer
+namespace Framework.DialogAnalyzer
 {
-    public abstract class AnalyzerBase
+    public abstract class QuestionAnalyzer
     {   /// <summary>
         /// Recognize a new input.
         /// </summary>

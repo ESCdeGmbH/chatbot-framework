@@ -14,12 +14,12 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Framework.ResponseAnalyzer
+namespace Framework.DialogAnalyzer
 {
     /// <summary>
     /// Examine input with regard to user responses.
     /// </summary>
-    public sealed class Analyzer
+    public sealed class ResponseAnalyzer
     {
         private readonly LuisRecognizer _classifier;
         private readonly double _threshold;
@@ -27,7 +27,7 @@ namespace Framework.ResponseAnalyzer
         private string _response;
 
         private readonly List<string> _blackList;
-        private static readonly string BlackListPath = RootPath.GetRootPath("Framework", "ResponseAnalyzer", "Blacklist.json");
+        private static readonly string BlackListPath = RootPath.GetRootPath("Framework", "DialogAnalyzer", "RA-Blacklist.json");
 
         private static readonly Dictionary<Language, string> Configs = new Dictionary<Language, string> {
             { Language.English, "en" },
@@ -42,7 +42,7 @@ namespace Framework.ResponseAnalyzer
         /// <param name="lang">Defines the language.</param>
         /// <param name="threshold">The default threshold for Luis classification.</param>
         /// <exception cref="ArgumentException">unsupported language.</exception>
-        public Analyzer(IConfiguration config, Language lang, double threshold)
+        public ResponseAnalyzer(IConfiguration config, Language lang, double threshold)
         {
             if (!Configs.ContainsKey(lang))
                 throw new ArgumentException("Your Language is not supported.");

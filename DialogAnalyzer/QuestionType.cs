@@ -1,4 +1,4 @@
-﻿namespace Framework.QuestionAnalyzer
+﻿namespace Framework.DialogAnalyzer
 {
     /// <summary>
     /// Defines all possible question types.

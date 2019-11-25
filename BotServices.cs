@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Framework.DialogAnalyzer;
+using Microsoft.Extensions.Configuration;
 
 namespace Framework
 {
@@ -23,10 +24,10 @@ namespace Framework
         /// <summary>
         /// The response analyzer for all dialogs.
         /// </summary>
-        public ResponseAnalyzer.Analyzer ResponseAnalyzer { get; protected set; }
+        public ResponseAnalyzer ResponseAnalyzer { get; protected set; }
         /// <summary>
         /// The question analyzer for all dialogs.
         /// </summary>
-        public QuestionAnalyzer.AnalyzerBase QuestionAnalyzer { get; protected set; }
+        public QuestionAnalyzer QuestionAnalyzer { get; protected set; }
     }
 }

@@ -9,12 +9,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Framework.QuestionAnalyzer
+namespace Framework.DialogAnalyzer
 {
     /// <summary>
     /// Examine input with regard to questions.
     /// </summary>
-    public sealed class Analyzer : AnalyzerBase
+    public sealed class LUISQuestionAnalyzer : QuestionAnalyzer
     {
         private readonly LuisRecognizer _classifier;
         private readonly double _threshold;
@@ -33,7 +33,7 @@ namespace Framework.QuestionAnalyzer
         /// <param name="lang">Defines the language.</param>
         /// <param name="threshold">The default threshold for Luis classification.</param>
         /// <exception cref="ArgumentException">unsupported language.</exception>
-        public Analyzer(IConfiguration config, Language lang, double threshold)
+        public LUISQuestionAnalyzer(IConfiguration config, Language lang, double threshold)
         {
             if (!Configs.ContainsKey(lang))
                 throw new ArgumentException("Your Language is not supported.");

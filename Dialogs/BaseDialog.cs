@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Framework.DialogAnalyzer;
+using System;
 
 namespace Framework.Dialogs
 {
@@ -20,11 +21,11 @@ namespace Framework.Dialogs
         /// <summary>
         /// The response analyzer for this dialog.
         /// </summary>
-        protected readonly ResponseAnalyzer.Analyzer ResponseAnalyzer;
+        protected readonly ResponseAnalyzer ResponseAnalyzer;
         /// <summary>
         /// The question analyzer for this dialog.
         /// </summary>
-        protected readonly QuestionAnalyzer.AnalyzerBase QuestionAnalyzer;
+        protected readonly QuestionAnalyzer QuestionAnalyzer;
 
         /// <summary>
         /// Configure the BaseDialog.

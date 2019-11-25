@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ResponseAnalyzer\Blacklist.json">
+    <None Update="DialogAnalyzer\RA-Blacklist.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
