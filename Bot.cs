@@ -1,11 +1,10 @@
-﻿using Framework.Dialogs;
-using Framework.Luis;
+﻿using Framework.Classifier;
+using Framework.Dialogs;
 using Framework.Misc;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -29,7 +28,7 @@ namespace Framework
         /// <param name="context">The context of the bot.</param>
         /// <param name="entities">The entities found by Luis.</param>
         /// <returns>The execution.</returns>
-        public delegate Task Handler(ITurnContext context, Dictionary<string, List<JToken>> entities);
+        public delegate Task Handler(ITurnContext context);
         /// <summary>
         /// The logger of this bot.
         /// </summary>
@@ -49,20 +48,12 @@ namespace Framework
         /// <summary>
         /// The main classifier Luis instance.
         /// </summary>
-        protected CombinedLuisRecognizer _recognizer;
+        protected IClassifier _recognizer;
 
         /// <summary>
         /// The result of classification with highest score included.
         /// </summary>
-        public RecognizerResult Result => _recognizer?.GetResult();
-
-        /// <summary>
-        /// The detected entities.
-        /// </summary>
-        /// <param name="cleanup">Indicator for cleanup (e.g. remove match to group if you are asking for resource group).</param>
-        /// <returns>All detected entities by entity-definitions.</returns>
-        public Dictionary<string, List<JToken>> GetEntities(bool cleanup = true) => _recognizer?.GetEntities(cleanup);
-
+        public ClassifierResult Result => _recognizer?.GetResult();
 
         /// <summary>
         /// Creates a new bot.
@@ -115,10 +106,10 @@ namespace Framework
         /// <returns>The Luis handler.</returns>
         protected Handler StartDialog(string dialogID)
         {
-            return (ctx, e) => HandleStartDialog(dialogID, ctx, e);
+            return (ctx) => HandleStartDialog(dialogID, ctx);
         }
 
-        private async Task HandleStartDialog(string dialogID, ITurnContext context, Dictionary<string, List<JToken>> entities)
+        private async Task HandleStartDialog(string dialogID, ITurnContext context)
         {
             var dCtx = await Dialogs.CreateContextAsync(context);
             var result = await dCtx.BeginDialogAsync(dialogID);
@@ -213,7 +204,7 @@ namespace Framework
         {
             return await ctx.SendActivityAsync(activity);
         }
-        
+
         #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿using Framework.Luis;
+﻿using Framework.Classifier;
 using Framework.Misc;
 using FuzzyString;
 using Microsoft.Bot.Builder;

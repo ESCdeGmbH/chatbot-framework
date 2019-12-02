@@ -1,8 +1,8 @@
-﻿using Framework.Misc;
+﻿using Framework.Classifier;
+using Framework.Misc;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -43,7 +43,7 @@ namespace Framework.Dialogs.Smalltalk
 
         private async Task<DialogTurnResult> ClassifySmallTalk(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var top = TheBot.Result.GetTopScoringIntent().intent.Substring("st_".Length);
+            var top = TheBot.Result.GetTopScoringIntent().Item1.Substring("st_".Length);
             if (!File.Exists(Path.Combine(SmallTalkPath, $"{top}.json")))
             {
                 await TheBot.SendMessage($"Ich habe noch nicht gelernt auf {top} zu antworten.", stepContext.Context);
@@ -74,16 +74,16 @@ namespace Framework.Dialogs.Smalltalk
             }
 
             List<string> entities = files.Where(f => f.StartsWith($"{top}_")).Select(f => f.Split('_', 2)[1]).ToList();
-            
+
             // Assume List Entity Name to be "E_{topic}"
-            if (!TheBot.GetEntities().TryGetValue($"E_{top}", out List<JToken> foundEntities))
+            if (!TheBot.Result.Entities.TryGetValue($"E_{top}", out List<IEntity> foundEntities))
             {
                 string path = Path.Combine(SmallTalkPath, $"{top}.json");
                 return JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(path));
             }
 
             // Assume List Entity
-            List<string> roots = foundEntities.ConvertAll(e => e.ToObject<string[]>()[0]);
+            var roots = foundEntities.Where(e => e.EType == EntityType.Group).Cast<GroupEntity>().Select(e => e.NormalizedValue);
 
             List<string> paths = entities.Where(e => roots.Contains(e)).Select(e => Path.Combine(SmallTalkPath, $"{top}_{e}.json")).ToList();
             if (!paths.Any())

@@ -1,4 +1,5 @@
-﻿using Microsoft.Bot.Builder;
+﻿using Framework.Classifier;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
@@ -12,16 +13,9 @@ namespace Framework.Dialogs
     public interface IBot4Dialog
     {  
         /// <summary>
-        /// The latest results of Luis.
+        /// The latest results of the classifier.
         /// </summary>
-        RecognizerResult Result { get; }
-
-        /// <summary>
-        /// The detected entities.
-        /// </summary>
-        /// <param name="cleanup">Indicator for cleanup (e.g. remove match to group if you are asking for resource group).</param>
-        /// <returns>All detected entities by entity-definitions.</returns>
-        Dictionary<string, List<JToken>> GetEntities(bool cleanup = true);
+        ClassifierResult Result { get; }
 
         /// <summary>
         /// Sends a text.

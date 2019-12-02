@@ -3,7 +3,7 @@ using Microsoft.Bot.Configuration;
 using Newtonsoft.Json;
 using System;
 
-namespace Framework.Luis
+namespace Framework.Classifier
 {
     /// <summary>
     /// Defines a Luis service.

@@ -7,12 +7,12 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 
-namespace Framework.Luis
+namespace Framework.Classifier
 {
     /// <summary>
     /// The extensions to work with Luis.
     /// </summary>
-    public static partial class LuisExtensions
+    public static class LuisExtensions
     {
         /// <summary>
         /// Extracts the intents of a Luis instance.
@@ -88,6 +88,24 @@ namespace Framework.Luis
             public List<Dictionary<string, object>> Sublists { get; set; }
         }
 
+        /// <summary>
+        /// Represents an intent of Luis.
+        /// </summary>
+        [Serializable]
+        public sealed class LuisIntent
+        {
+            /// <summary>
+            /// The Id of the intent.
+            /// </summary>
+            [JsonProperty("id")]
+            public string ID { get; private set; }
+            /// <summary>
+            /// The name of the intent.
+            /// </summary>
+            [JsonProperty("name")]
+            public string Name { get; private set; }
+        }
+
 
         public static double GetSentiment(this RecognizerResult _result)
         {
@@ -105,6 +123,78 @@ namespace Framework.Luis
             return score < 0.35 ? Sentiment.Negative : (score > 0.7 ? Sentiment.Positive : Sentiment.Neutral);
         }
 
+
+        /// <summary>
+        /// Retrieve the entities of the entity property in a Luis result.
+        /// </summary>
+        /// <param name="entities">The entity property in a Luis result.</param>
+        /// <param name="cleanup">Indicator for cleanup (e.g. remove match to group if you are asking for resource group).</param>
+        /// <returns>Extracted entities with their values.</returns>
+        public static Dictionary<string, List<LuisRawEntity>> GetRawEntities(this JObject entities, bool cleanup)
+        {
+            if (entities == null)
+                return new Dictionary<string, List<LuisRawEntity>>();
+
+
+            var mapType2Data = entities.GetValue("$instance").ToObject<Dictionary<string, List<LuisRawEntity>>>();
+
+            foreach (var entityType in mapType2Data.Keys)
+            {
+                entities.TryGetValue(entityType, out JToken resolution);
+
+                JToken[] reses = resolution.Children().ToArray() ?? new JToken[0];
+                List<LuisRawEntity> entitiesFromLuis = mapType2Data[entityType];
+                if (reses.Length != entitiesFromLuis.Count)
+                {
+                    // Shall not happen ..
+                    continue;
+                }
+
+                for (int i = 0; i < reses.Length; i++)
+                    entitiesFromLuis[i].Resolution = reses[i];
+            }
+
+            return cleanup ? CleanupRaw(mapType2Data) : mapType2Data;
+        }
+
+        private static Dictionary<string, List<LuisRawEntity>> CleanupRaw(Dictionary<string, List<LuisRawEntity>> rawData)
+        {
+            Dictionary<string, List<LuisRawEntity>> result = new Dictionary<string, List<LuisRawEntity>>();
+            foreach (string key in rawData.Keys)
+            {
+                List<LuisRawEntity> value = rawData[key].ToList();
+                if (value.Count == 0 || value[0].Resolution == null)
+                    continue;
+                var example = value[0];
+                if (example.Resolution.Type != JTokenType.Array)
+                {
+                    result.Add(key, value);
+                    continue;
+                }
+
+                if (value.Any(a => a.Resolution.ToObject<object[]>().Length != 1))
+                {
+                    // Not each one element ..
+                    continue;
+                }
+
+                value.Sort((e1, e2) => e2.Text.Length - e1.Text.Length);
+                List<LuisRawEntity> newValue = new List<LuisRawEntity>();
+                List<string> texts = new List<string>();
+                foreach (LuisRawEntity v in value)
+                {
+                    if (texts.Any(nt => nt.Contains(v.Text)))
+                        continue;
+                    newValue.Add(v);
+                    texts.Add(v.Text);
+                }
+
+                result.Add(key, newValue);
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// Retrieve the entities of the entity property in a Luis result.
         /// </summary>
@@ -117,73 +207,15 @@ namespace Framework.Luis
                 return new Dictionary<string, List<JToken>>();
 
 
-            var mapType2Data = entities.GetValue("$instance").ToObject<Dictionary<string, List<LuisLoader>>>();
-
-            foreach (var entityType in mapType2Data.Keys)
-            {
-                entities.TryGetValue(entityType, out JToken resolution);
-
-                JToken[] reses = resolution.Children().ToArray() ?? new JToken[0];
-                List<LuisLoader> entitiesFromLuis = mapType2Data[entityType];
-                if (reses.Length != entitiesFromLuis.Count)
-                {
-                    // Shall not happen ..
-                    continue;
-                }
-
-                for (int i = 0; i < reses.Length; i++)
-                    entitiesFromLuis[i].Resolution = reses[i];
-            }
-
-            if (cleanup)
-                return Cleanup(mapType2Data);
-
-
+            var mapType2Data = entities.GetRawEntities(cleanup);
             Dictionary<string, List<JToken>> result = new Dictionary<string, List<JToken>>();
             foreach (var key in mapType2Data.Keys)
                 result.Add(key, mapType2Data[key].ConvertAll(d => d.Resolution));
             return result;
         }
 
-        private static Dictionary<string, List<JToken>> Cleanup(Dictionary<string, List<LuisLoader>> rawData)
-        {
-            Dictionary<string, List<JToken>> result = new Dictionary<string, List<JToken>>();
-            foreach (string key in rawData.Keys)
-            {
-                List<LuisLoader> value = rawData[key].ToList();
-                if (value.Count == 0 || value[0].Resolution == null)
-                    continue;
-                var example = value[0];
-                if (example.Resolution.Type != JTokenType.Array)
-                {
-                    continue;
-                }
-
-                if (value.Any(a => a.Resolution.ToObject<object[]>().Length != 1))
-                {
-                    // Not each one element ..
-                    continue;
-                }
-
-                value.Sort((e1, e2) => e2.Text.Length - e1.Text.Length);
-                List<JToken> newValue = new List<JToken>();
-                List<string> texts = new List<string>();
-                foreach (LuisLoader v in value)
-                {
-                    if (texts.Any(nt => nt.Contains(v.Text)))
-                        continue;
-                    newValue.Add(v.Resolution);
-                    texts.Add(v.Text);
-                }
-
-                result.Add(key, newValue);
-            }
-
-            return result;
-        }
-
         [Serializable]
-        private sealed class LuisLoader
+        public sealed class LuisRawEntity
         {
             [JsonProperty("startIndex")]
             public int StartIndex { get; set; }

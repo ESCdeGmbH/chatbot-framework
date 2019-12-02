@@ -1,4 +1,4 @@
-﻿using Framework.Luis;
+﻿using Framework.Classifier;
 using Framework.Misc;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.AI.Luis;
