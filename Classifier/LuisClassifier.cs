@@ -9,6 +9,9 @@ using static Framework.Classifier.LuisExtensions;
 
 namespace Framework.Classifier
 {
+    /// <summary>
+    /// Defines an implementation of <see cref="IClassifier"/> using Luis.
+    /// </summary>
     public sealed class LuisClassifier : IClassifier
     {
         private LuisRecognizer _withCorrection;
@@ -17,13 +20,18 @@ namespace Framework.Classifier
         private RecognizerResult _resultWithCorrection;
         private RecognizerResult _resultWithoutCorrection;
 
+        /// <summary>
+        /// Creates a classifier with Luis.
+        /// </summary>
+        /// <param name="lsd">Definition of a Luis service.</param>
+        /// <param name="trySpellcheck">Indicates if spellchecker is on or off.</param>
         public LuisClassifier(LuisServiceDefinition lsd, bool trySpellcheck = true)
         {
             _withoutCorrection = new LuisRecognizer(lsd.GetLuisService(), new LuisPredictionOptions() { IncludeAllIntents = true });
             if (trySpellcheck && lsd.SpellCheckerKey != null)
                 _withCorrection = new LuisRecognizer(lsd.GetLuisService(), lsd.GetPredictOpts());
         }
-
+        
         public async Task Recognize(ITurnContext context, CancellationToken cancellationToken)
         {
             _resultWithCorrection = await (_withCorrection?.RecognizeAsync(context, cancellationToken) ?? Task.FromResult<RecognizerResult>(null));

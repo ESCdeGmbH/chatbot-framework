@@ -83,7 +83,7 @@ namespace Framework.Dialogs.Smalltalk
             }
 
             // Assume List Entity
-            var roots = foundEntities.Where(e => e.EType == EntityType.Group).Cast<GroupEntity>().Select(e => e.NormalizedValue);
+            var roots = foundEntities.Where(e => e.EType == EntityType.Group).Cast<GroupEntity>().Select(e => e.Shape);
 
             List<string> paths = entities.Where(e => roots.Contains(e)).Select(e => Path.Combine(SmallTalkPath, $"{top}_{e}.json")).ToList();
             if (!paths.Any())
