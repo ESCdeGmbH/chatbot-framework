@@ -1,12 +1,30 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <PackageId>Chatbot-Framework</PackageId>
+    <Authors>ESCde (AI)</Authors>
+    <Company>ESC Deutschland GmbH</Company>
+    <Product>Chatbot-Framework</Product>
+    <Description>Easy applicable and dynamically building dialogue management framework based on the MS Bot Framework</Description>
+    <Copyright>ESC Deutschland GmbH</Copyright>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/ESCdeGmbH/chatbot-framework</PackageProjectUrl>
+    <RepositoryUrl>https://packages.escde.net/repository/chatbots/</RepositoryUrl>
+    <Version>2020.01.20</Version>
+    <PackageLicenseExpression></PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <NoWarn>1701;1702;0168</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AdaptiveCards" Version="1.2.2" />
