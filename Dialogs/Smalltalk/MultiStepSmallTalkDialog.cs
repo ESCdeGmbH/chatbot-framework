@@ -45,8 +45,8 @@ namespace Framework.Dialogs.Smalltalk
         /// <returns></returns>
         protected async Task<DialogTurnResult> SimpleAnswer(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            string json = File.ReadAllText(Path.Combine(_smallTalkPath, $"{_top}.json"));
-            List<string> answers = JsonConvert.DeserializeObject<List<string>>(json);
+            string json = MiscExtensions.LoadEmbeddedResource(_smallTalkPath + "." + $"{_top}.json");
+            List<string> answers = json == null ? new List<string>() : JsonConvert.DeserializeObject<List<string>>(json);
             await TheBot.SendMessage(GetSimpleAnswer(answers), stepContext.Context);
             return await stepContext.NextAsync();
         }

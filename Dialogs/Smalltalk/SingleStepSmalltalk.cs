@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -44,7 +45,7 @@ namespace Framework.Dialogs.Smalltalk
         private async Task<DialogTurnResult> ClassifySmallTalk(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var top = TheBot.Result.GetTopScoringIntent().Item1.Substring("st_".Length);
-            if (!File.Exists(Path.Combine(SmallTalkPath, $"{top}.json")))
+            if (MiscExtensions.LoadEmbeddedResource(SmallTalkPath + "." + $"{top}.json") == null)
             {
                 await TheBot.SendMessage($"Ich habe noch nicht gelernt auf {top} zu antworten.", stepContext.Context);
             }
@@ -63,14 +64,16 @@ namespace Framework.Dialogs.Smalltalk
         /// <returns>a list of answer templates</returns>
         protected virtual List<string> FindSpecificAnswers(string top)
         {
-            List<string> files = Directory.GetFiles(SmallTalkPath).Select(f => Path.GetFileNameWithoutExtension(f)).Where(f => f.StartsWith(top)).ToList();
+            List<string> files = Assembly.GetEntryAssembly().GetManifestResourceNames().Where(s => s.StartsWith(SmallTalkPath))
+                .Select(s => s.Substring(SmallTalkPath.Length + 1))
+                .Select(f => Path.GetFileNameWithoutExtension(f)).Where(f => f.StartsWith(top)).ToList();
             if (!files.Any())
                 throw new FileNotFoundException($"No file found for {top}");
 
             if (files.Count == 1)
             {
-                string path = Path.Combine(SmallTalkPath, $"{files[0]}.json");
-                return JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(path));
+                string data = MiscExtensions.LoadEmbeddedResource(SmallTalkPath + "." + $"{files[0]}.json");
+                return JsonConvert.DeserializeObject<List<string>>(data);
             }
 
             List<string> entities = files.Where(f => f.StartsWith($"{top}_")).Select(f => f.Split('_', 2)[1]).ToList();
@@ -78,21 +81,21 @@ namespace Framework.Dialogs.Smalltalk
             // Assume List Entity Name to be "E_{topic}"
             if (!TheBot.Result.Entities.TryGetValue($"E_{top}", out List<IEntity> foundEntities))
             {
-                string path = Path.Combine(SmallTalkPath, $"{top}.json");
-                return JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(path));
+                string data = MiscExtensions.LoadEmbeddedResource(SmallTalkPath + "." + $"{top}.json");
+                return JsonConvert.DeserializeObject<List<string>>(data);
             }
 
             // Assume List Entity
             var roots = foundEntities.Where(e => e.EType == EntityType.Group).Cast<GroupEntity>().Select(e => e.Shape);
 
-            List<string> paths = entities.Where(e => roots.Contains(e)).Select(e => Path.Combine(SmallTalkPath, $"{top}_{e}.json")).ToList();
+            List<string> paths = entities.Where(e => roots.Contains(e)).Select(e => SmallTalkPath + "." + $"{top}_{e}.json").ToList();
             if (!paths.Any())
             {
-                string path = Path.Combine(SmallTalkPath, $"{top}.json");
-                return JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(path));
+                string data = MiscExtensions.LoadEmbeddedResource(SmallTalkPath + "." + $"{top}.json");
+                return JsonConvert.DeserializeObject<List<string>>(data);
             }
 
-            return paths.SelectMany(p => JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(p))).ToList();
+            return paths.SelectMany(p => JsonConvert.DeserializeObject<List<string>>(MiscExtensions.LoadEmbeddedResource(p))).ToList();
         }
 
         /// <summary>

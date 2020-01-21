@@ -64,10 +64,22 @@ namespace Framework.Misc
         /// Read data from embedded resource.
         /// </summary>
         /// <param name="resourceName">the name of the resource (e.g. Framework.DialogAnalyzer.RA-Blacklist.json)</param>
+        /// <param name="assembly">the assembly to be searched (can by null, we will search different assemblies)</param>
         /// <returns>the data or null iff not found</returns>
-        public static string LoadEmbeddedResource(string resourceName)
+        public static string LoadEmbeddedResource(string resourceName, Assembly assembly = null)
         {
-            var assembly = Assembly.GetExecutingAssembly();
+            var assemblies = assembly != null ? new List<Assembly> { assembly } : new List<Assembly> { Assembly.GetEntryAssembly(), Assembly.GetExecutingAssembly(), Assembly.GetCallingAssembly() };
+            string data = null;
+            foreach (var a in assemblies)
+                if ((data = LoadEmbeddedResourceByAssembly(resourceName, a)) != null)
+                    return data;
+            return null;
+        }
+
+        private static string LoadEmbeddedResourceByAssembly(string resourceName, Assembly assembly)
+        {
+            if (assembly == null)
+                return null;
             Stream stream = assembly.GetManifestResourceStream(resourceName);
             if (stream == null)
                 return null;
