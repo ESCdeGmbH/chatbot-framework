@@ -3,7 +3,7 @@
 
 This framework based on [Microsofts Bot Framework](https://dev.botframework.com/) provides an easy applicable and dynamically building dialogue management. 
 
-For classification of user input various classifier can be taken. In our example we've chosen [Microsofts Luis](https://luis.ai/). We recommend to create several apps for classification of: 
+For classification of user input various classifier can be taken. In our example we've chosen [Microsofts LUIS](https://luis.ai/). We recommend to create several apps for classification of: 
 1) Topics (dependent on purpose of the bot)
 2) Question types
 3) Fixed commands (e.g. "cancel")
@@ -19,3 +19,6 @@ The framework can be used is language independent and supports a lot of differen
 **You don't have to write much code to create your first chatbot. Try it out!**
 
 To learn more about it, take a look in our [Wiki](https://github.com/ESCdeGmbH/chatbot-framework/wiki).
+
+## NuGet
+You can use our precompiled library by adding [https://packages.escde.net/repository/chatbots/](https://packages.escde.net/repository/chatbots/) to your NuGet Package Sources. Also take a look at our [sample](https://github.com/ESCdeGmbH/echobot).
