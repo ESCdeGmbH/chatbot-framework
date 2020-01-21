@@ -28,18 +28,7 @@ namespace Framework.DialogAnalyzer
         private string _response;
 
         private readonly List<string> _blackList;
-        private static readonly string BlackListRawData = GetBlacklist();
-
-        private static string GetBlacklist()
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = "Framework.DialogAnalyzer.RA-Blacklist.json";
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                return reader.ReadToEnd();
-            }
-        }
+        private static readonly string BlackListRawData = MiscExtensions.LoadEmbeddedResource("Framework.DialogAnalyzer.RA-Blacklist.json");
 
         private static readonly Dictionary<Language, string> Configs = new Dictionary<Language, string> {
             { Language.English, "en" },

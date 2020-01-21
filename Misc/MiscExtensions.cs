@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace Framework.Misc
 {
@@ -57,5 +59,23 @@ namespace Framework.Misc
         /// <param name="a">The first element.</param>
         /// <param name="b">The second element.</param>
         public static void Add<A, B>(this List<Tuple<A, B>> _this, A a, B b) => _this.Add(new Tuple<A, B>(a, b));
+
+        /// <summary>
+        /// Read data from embedded resource.
+        /// </summary>
+        /// <param name="resourceName">the name of the resource (e.g. Framework.DialogAnalyzer.RA-Blacklist.json)</param>
+        /// <returns>the data or null iff not found</returns>
+        public static string LoadEmbeddedResource(string resourceName)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            Stream stream = assembly.GetManifestResourceStream(resourceName);
+            if (stream == null)
+                return null;
+            using (stream)
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
     }
 }
