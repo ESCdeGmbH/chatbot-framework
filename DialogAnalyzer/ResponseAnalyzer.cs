@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,7 +28,18 @@ namespace Framework.DialogAnalyzer
         private string _response;
 
         private readonly List<string> _blackList;
-        private static readonly string BlackListPath = RootPath.GetRootPath("Framework", "DialogAnalyzer", "RA-Blacklist.json");
+        private static readonly string BlackListRawData = GetBlacklist();
+
+        private static string GetBlacklist()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "Framework.DialogAnalyzer.RA-Blacklist.json";
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
 
         private static readonly Dictionary<Language, string> Configs = new Dictionary<Language, string> {
             { Language.English, "en" },
@@ -47,7 +59,7 @@ namespace Framework.DialogAnalyzer
             if (!Configs.ContainsKey(lang))
                 throw new ArgumentException("Your Language is not supported.");
 
-            _blackList = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(File.ReadAllText(BlackListPath))[Configs[lang]];
+            _blackList = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(BlackListRawData)[Configs[lang]];
 
             var map = config.GetSection("ResponseAnalyzer").GetSection(Configs[lang]).Get<Dictionary<string, object>>();
             LuisServiceDefinition lsd = JsonConvert.DeserializeObject<LuisServiceDefinition>(JsonConvert.SerializeObject(map));
