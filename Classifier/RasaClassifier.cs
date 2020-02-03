@@ -64,9 +64,11 @@ namespace Framework.Classifier
             {
                 string error = await rasaResponse.Content.ReadAsStringAsync();
                 _logger?.LogError(error);
+                _classification = null;
+                return;
             }
             string classification = await rasaResponse.Content.ReadAsStringAsync();
-            this._classification = JsonConvert.DeserializeObject<RasaClassificationResult>(classification);
+            _classification = JsonConvert.DeserializeObject<RasaClassificationResult>(classification);
         }
 
 
