@@ -42,9 +42,9 @@ namespace Framework
         /// </summary>
         protected readonly ConversationState State;
         /// <summary>
-        /// The Luis handlers (maps intents(lower case) to handler).
+        /// The Intent handlers (maps intents(lower case) to handler).
         /// </summary>
-        protected readonly Dictionary<string, Handler> LuisHandlers;
+        protected readonly Dictionary<string, Handler> IntentHandler;
         /// <summary>
         /// The main classifier Luis instance.
         /// </summary>
@@ -72,16 +72,10 @@ namespace Framework
             _logger.LogTrace("Bot turn start.");
 
             State = state;
-            LuisHandlers = LoadLuisHandlers();
+            IntentHandler = new Dictionary<string, Handler>();
+
             LoadDialogs(out Dialogs, out DialogInstances);
-
         }
-
-        /// <summary>
-        /// Returns all Luis handlers.
-        /// </summary>
-        /// <returns>The Luis handlers.</returns>
-        protected abstract Dictionary<string, Handler> LoadLuisHandlers();
 
         /// <summary>
         /// A dialog set of all possible dialogs.
