@@ -42,9 +42,9 @@ namespace Framework
         /// </summary>
         protected readonly ConversationState State;
         /// <summary>
-        /// The Intent handlers (maps intents(lower case) to handler).
+        /// The Intent handlers (maps intents(lower case) to dialogs).
         /// </summary>
-        protected readonly Dictionary<string, Handler> IntentHandler;
+        protected readonly Dictionary<string, string> IntentHandler;
         /// <summary>
         /// The main classifier Luis instance.
         /// </summary>
@@ -72,7 +72,7 @@ namespace Framework
             _logger.LogTrace("Bot turn start.");
 
             State = state;
-            IntentHandler = new Dictionary<string, Handler>();
+            IntentHandler = new Dictionary<string, string>();
 
             LoadDialogs(out Dialogs, out DialogInstances);
         }
@@ -120,15 +120,22 @@ namespace Framework
         /// <returns>An execution.</returns>
         protected virtual async Task HandleDialogResult(ITurnContext ctx, CancellationToken cancellationToken, DialogContext dialogContext, DialogTurnResult dialogResult)
         {
+            if (dialogResult == null)
+            {
+                // Assume Dialog Chaining ..
+                await Chain(ctx, cancellationToken, dialogContext, dialogResult);
+                return;
+            }
+
             switch (dialogResult.Status)
             {
                 case DialogTurnStatus.Empty:
-                    DialogInstances.ForEach(d => d.Reset());
-                    await SelectTopic(ctx, cancellationToken);
+                    string dialog = await ClassifyDialog(ctx);
+                    if (dialog != null)
+                        await StartDialog(dialog)(ctx);
                     break;
                 case DialogTurnStatus.Complete:
                     await dialogContext.EndDialogAsync();
-                    DialogInstances.ForEach(d => d.Reset());
                     break;
                 case DialogTurnStatus.Cancelled:
                     await dialogContext.CancelAllDialogsAsync();
@@ -140,13 +147,21 @@ namespace Framework
             await State.SaveChangesAsync(ctx, cancellationToken: cancellationToken);
         }
 
+        private async Task Chain(ITurnContext ctx, CancellationToken cancellationToken, DialogContext dialogContext, DialogTurnResult dialogResult)
+        {
+            string dialog = await ClassifyDialog(ctx);
+            if (dialog == null)
+                return;
+            var result = await dialogContext.BeginDialogAsync(dialog);
+            await HandleDialogResult(ctx, cancellationToken, dialogContext, result);
+        }
+
         /// <summary>
-        /// Select topic and run dialog.
+        /// Select topic and return dialog id.
         /// </summary>
         /// <param name="ctx">the context</param>
-        /// <param name="cancellationToken">the cancellation token</param>
-        /// <returns>indicator of success</returns>
-        protected abstract Task<bool> SelectTopic(ITurnContext ctx, CancellationToken cancellationToken);
+        /// <returns>the dialog id or null if none found</returns>
+        protected abstract Task<string> ClassifyDialog(ITurnContext ctx);
 
         protected abstract override Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken);
 

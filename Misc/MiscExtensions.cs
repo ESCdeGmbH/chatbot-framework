@@ -76,6 +76,20 @@ namespace Framework.Misc
             return null;
         }
 
+        public static List<string> ListEmbeddedFiles(string path, Assembly assembly = null)
+        {
+            var assemblies = assembly != null ? new List<Assembly> { assembly } : new List<Assembly> { Assembly.GetEntryAssembly(), Assembly.GetExecutingAssembly(), Assembly.GetCallingAssembly() };
+            List<string> resources = new List<string>();
+            foreach (var a in assemblies)
+            {
+                if (a == null)
+                    continue;
+                var rs = a.GetManifestResourceNames();
+                resources.AddRange(rs.Where(r => r.StartsWith(path)));
+            }
+            return resources.Distinct().ToList();
+        }
+
         private static string LoadEmbeddedResourceByAssembly(string resourceName, Assembly assembly)
         {
             if (assembly == null)

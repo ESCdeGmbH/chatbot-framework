@@ -29,7 +29,8 @@ namespace Framework.Dialogs.Smalltalk
         /// <param name="bot">the bot itself</param>
         /// <param name="ID">the id of the dialog</param>
         /// <param name="smallTalkPath">the path to the smalltalk templates. The path to the folder of smalltalk template jsons. The name of the templates must match {TopicName}.json</param>
-        protected MultiStepSmallTalkDialog(S services, B bot, string ID, string smallTalkPath) : base(services, bot, ID)
+        /// <param name="resetOnEnd">Indicator whether EndDialogAsync() shall automatically invoke Reset() </param>
+        protected MultiStepSmallTalkDialog(S services, B bot, string ID, string smallTalkPath, bool resetOnEnd = true) : base(services, bot, ID, resetOnEnd)
         {
             _smallTalkPath = smallTalkPath;
             if (!GetType().Name.EndsWith("Dialog"))
