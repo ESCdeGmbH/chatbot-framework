@@ -48,12 +48,12 @@ namespace Framework
         /// <summary>
         /// The main classifier Luis instance.
         /// </summary>
-        protected IClassifier _recognizer;
+        protected IClassifier _classifier;
 
         /// <summary>
         /// The result of classification with highest score included.
         /// </summary>
-        public ClassifierResult Result => _recognizer?.GetResult();
+        public ClassifierResult Result => _classifier?.GetResult();
 
         /// <summary>
         /// Creates a new bot.

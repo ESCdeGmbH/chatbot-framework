@@ -1,5 +1,6 @@
 ﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.AI.Luis;
+using Microsoft.Bot.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,11 +28,15 @@ namespace Framework.Classifier
         /// <param name="trySpellcheck">Indicates if spellchecker is on or off.</param>
         public LuisClassifier(LuisServiceDefinition lsd, bool trySpellcheck = true)
         {
-            _withoutCorrection = new LuisRecognizer(lsd.GetLuisService(), new LuisPredictionOptions() { IncludeAllIntents = true });
+            _withoutCorrection = new LuisRecognizer(
+                new LuisRecognizerOptionsV2(new LuisApplication(lsd.GetLuisService())) { PredictionOptions = new LuisPredictionOptions() { IncludeAllIntents = true } }
+            );
             if (trySpellcheck && lsd.SpellCheckerKey != null)
-                _withCorrection = new LuisRecognizer(lsd.GetLuisService(), lsd.GetPredictOpts());
+                _withCorrection = new LuisRecognizer(
+                    new LuisRecognizerOptionsV2(new LuisApplication(lsd.GetLuisService())) { PredictionOptions = lsd.GetPredictOpts() }
+                );
         }
-        
+
         public async Task Recognize(ITurnContext context, CancellationToken cancellationToken)
         {
             _resultWithCorrection = await (_withCorrection?.RecognizeAsync(context, cancellationToken) ?? Task.FromResult<RecognizerResult>(null));

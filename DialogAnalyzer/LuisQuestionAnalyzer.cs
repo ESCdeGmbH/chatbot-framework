@@ -39,7 +39,9 @@ namespace Framework.DialogAnalyzer
                 throw new ArgumentException("Your Language is not supported.");
             var map = config.GetSection("QuestionAnalyzer").GetSection(Configs[lang]).Get<Dictionary<string, object>>();
             LuisServiceDefinition lsd = JsonConvert.DeserializeObject<LuisServiceDefinition>(JsonConvert.SerializeObject(map));
-            _classifier = new LuisRecognizer(lsd.GetLuisService(), lsd.GetPredictOpts());
+            _classifier = new LuisRecognizer(
+                new LuisRecognizerOptionsV2(new LuisApplication(lsd.GetLuisService())) { PredictionOptions = lsd.GetPredictOpts() }
+            );
             _threshold = threshold;
         }
 
