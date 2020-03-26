@@ -55,7 +55,7 @@ namespace Framework
         /// <seealso cref="IStatePropertyAccessor{T}"/>
         /// <seealso cref="https://docs.microsoft.com/en-us/aspnet/web-api/overview/advanced/dependency-injection"/>
         /// <seealso cref="https://docs.microsoft.com/en-us/azure/bot-service/bot-service-manage-channels?view=azure-bot-service-4.0"/>
-        
+
         public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers().AddNewtonsoftJson();
@@ -81,13 +81,18 @@ namespace Framework
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseHsts();
-            }
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
-            app.UseMvc();
+
+            app.UseDefaultFiles()
+                .UseStaticFiles()
+                .UseWebSockets()
+                .UseRouting()
+                .UseAuthorization()
+                .UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                });
+
+            // app.UseHttpsRedirection();
         }
     }
 }

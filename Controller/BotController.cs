@@ -62,12 +62,12 @@ namespace Framework.Controller
         /// Handle the user request.
         /// </summary>
         /// <returns>the response of the bot.</returns>
-        [HttpPost]
+        [HttpPost, HttpGet]
         public async Task PostAsync()
         {
             // Delegate the processing of the HTTP POST to the adapter.
             // The adapter will invoke the bot.
-            JObject json = JsonConvert.DeserializeObject<JObject>(GetDocumentContents(Request));
+            JObject json = JsonConvert.DeserializeObject<JObject>(await GetDocumentContents(Request));
             var id = json["conversation"]["id"].ToString();
             TBot bot;
             lock (bots)
@@ -110,9 +110,12 @@ namespace Framework.Controller
                 }
             }
         }
-        private string GetDocumentContents(HttpRequest Request)
+        private async Task<string> GetDocumentContents(HttpRequest Request)
         {
-            string body = new StreamReader(Request.Body).ReadToEnd();
+            string body;
+            using (var reader = new StreamReader(Request.Body))
+                body = await reader.ReadToEndAsync();
+
             byte[] requestData = Encoding.UTF8.GetBytes(body);
             Request.Body = new MemoryStream(requestData);
             return body;
