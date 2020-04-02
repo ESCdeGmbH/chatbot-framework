@@ -49,7 +49,7 @@ namespace Framework.Dialogs.Smalltalk
             string json = MiscExtensions.LoadEmbeddedResource(_smallTalkPath + "." + $"{_top}.json");
             List<string> answers = json == null ? new List<string>() : JsonConvert.DeserializeObject<List<string>>(json);
             await TheBot.SendMessage(GetSimpleAnswer(answers), stepContext.Context);
-            return await stepContext.NextAsync();
+            return await ProceedWithDialog(stepContext);
         }
         /// <summary>
         /// Extract answer from answers templates.

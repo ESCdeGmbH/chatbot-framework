@@ -54,7 +54,7 @@ namespace Framework.Dialogs.Smalltalk
                 List<string> answers = FindSpecificAnswers(top);
                 await TheBot.SendMessage(GetAnswer(answers), stepContext.Context);
             }
-            return await stepContext.NextAsync();
+            return await ProceedWithDialog(stepContext);
         }
 
         /// <summary>
