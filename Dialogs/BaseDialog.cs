@@ -56,21 +56,21 @@ namespace Framework.Dialogs
         }
 
         /// <summary>
-        /// Use that method in a dialog step to continue the dialog. (e.g. return await ContinueDialog(stepContext);)
+        /// Use that method in a dialog step to continue the dialog. (e.g. return await ProceedWithDialog(stepContext);)
         /// </summary>
         /// <param name="stepContext">the current step context</param>
         /// <returns>the result of the current dialog turn</returns>
-        protected Task<DialogTurnResult> ContinueDialog(WaterfallStepContext stepContext)
+        protected Task<DialogTurnResult> ProceedWithDialog(WaterfallStepContext stepContext)
         {
             return stepContext.NextAsync();
         }
 
         /// <summary>
-        /// Use that method in a dialog step to signalize that the dialog waits user input. (e.g. return await WaitForUserinput(stepContext);)
+        /// Use that method in a dialog step to signalize that the dialog waits user input. (e.g. return await WaitForUserInput(stepContext);)
         /// </summary>
         /// <param name="stepContext">the current step context</param>
         /// <returns>the result of the current dialog turn</returns>
-        protected Task<DialogTurnResult> WaitForUserinput(WaterfallStepContext stepContext)
+        protected Task<DialogTurnResult> WaitForUserInput(WaterfallStepContext stepContext)
         {
             return Task.FromResult(new DialogTurnResult(DialogTurnStatus.Waiting));
         }
