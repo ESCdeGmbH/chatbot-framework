@@ -54,5 +54,35 @@ namespace Framework.Dialogs
                 Reset();
             return base.EndDialogAsync(turnContext, instance, reason, cancellationToken);
         }
+
+        /// <summary>
+        /// Use that method in a dialog step to continue the dialog. (e.g. return await ContinueDialog(stepContext);)
+        /// </summary>
+        /// <param name="stepContext">the current step context</param>
+        /// <returns>the result of the current dialog turn</returns>
+        protected Task<DialogTurnResult> ContinueDialog(WaterfallStepContext stepContext)
+        {
+            return stepContext.NextAsync();
+        }
+
+        /// <summary>
+        /// Use that method in a dialog step to signalize that the dialog waits user input. (e.g. return await WaitForUserinput(stepContext);)
+        /// </summary>
+        /// <param name="stepContext">the current step context</param>
+        /// <returns>the result of the current dialog turn</returns>
+        protected Task<DialogTurnResult> WaitForUserinput(WaterfallStepContext stepContext)
+        {
+            return Task.FromResult(new DialogTurnResult(DialogTurnStatus.Waiting));
+        }
+
+        /// <summary>
+        /// Use that method in a dialog step to switch the context of the dialogs. As a result of this method, the current input will be classified again and the corresponding dialog should start (e.g. return await SwitchContext(stepContext);)
+        /// </summary>
+        /// <param name="stepContext">the current step context</param>
+        /// <returns>the result of the current dialog turn</returns>
+        protected Task<DialogTurnResult> SwitchContext(WaterfallStepContext stepContext)
+        {
+            return Task.FromResult<DialogTurnResult>(null);
+        }
     }
 }
