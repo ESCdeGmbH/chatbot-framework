@@ -8,44 +8,43 @@ namespace Framework.Classifier
     /// <summary>
     /// Defines a Luis service.
     /// </summary>
-    [Serializable]
     public sealed class LuisServiceDefinition
     {
         /// <summary>
         /// The name of the Luis service.
         /// </summary>
         [JsonProperty("name")]
-        public string Name { get; private set; }
+        public string Name { get; set; }
         /// <summary>
         /// The version of the Luis service.
         /// </summary>
         [JsonProperty("version")]
-        public string Version { get; private set; }
+        public string Version { get; set; }
         /// <summary>
         /// The application Id of the Luis service.
         /// </summary>
         [JsonProperty("appId")]
-        public string AppId { get; private set; }
+        public string AppId { get; set; }
         /// <summary>
         /// The authoring key of the Luis service.
         /// </summary>
         [JsonProperty("authoringKey")]
-        public string AuthoringKey { get; private set; }
+        public string AuthoringKey { get; set; }
         /// <summary>
         /// The subscription key of the Luis service in Azure.
         /// </summary>
         [JsonProperty("subscriptionKey")]
-        public string SubscriptionKey { get; private set; }
+        public string SubscriptionKey { get; set; }
         /// <summary>
         /// The region of the Luis service.
         /// </summary>
         [JsonProperty("region")]
-        public string Region { get; private set; }
+        public string Region { get; set; }
         /// <summary>
         ///  The spell checker key of the spell checker subscription in Azure.
         /// </summary>
         [JsonProperty("spellCheckerKey")]
-        public string SpellCheckerKey { get; private set; }
+        public string SpellCheckerKey { get; set; }
 
         /// <summary>
         /// Converts a Luis service definition into a Luis service.

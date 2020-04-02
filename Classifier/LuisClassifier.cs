@@ -15,8 +15,8 @@ namespace Framework.Classifier
     /// </summary>
     public sealed class LuisClassifier : IClassifier
     {
-        private LuisRecognizer _withCorrection;
-        private LuisRecognizer _withoutCorrection;
+        private readonly LuisRecognizer _withCorrection;
+        private readonly LuisRecognizer _withoutCorrection;
 
         private RecognizerResult _resultWithCorrection;
         private RecognizerResult _resultWithoutCorrection;
@@ -47,12 +47,11 @@ namespace Framework.Classifier
         {
             if (_resultWithoutCorrection == null)
                 return null;
-
-            var topIntentWithoutCorrection = _resultWithoutCorrection.GetTopScoringIntent();
+            var (_, score) = _resultWithoutCorrection.GetTopScoringIntent();
             if (_resultWithCorrection != null)
             {
-                var topIntentWithCorrections = _resultWithCorrection?.GetTopScoringIntent();
-                if (topIntentWithoutCorrection.score < (topIntentWithCorrections?.score ?? double.MinValue))
+                var (_, scoreWithCorrection) = _resultWithCorrection.GetTopScoringIntent();
+                if (score < scoreWithCorrection)
                     return ToResult(_resultWithCorrection, cleanup);
             }
             return ToResult(_resultWithoutCorrection, cleanup);
