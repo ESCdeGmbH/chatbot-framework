@@ -18,6 +18,7 @@ namespace Framework.Classifier
     {
         private readonly string _serverUrl;
         private readonly HttpClient _client;
+        private readonly double _minEntityConfidence;
         private readonly ILogger _logger;
 
         private RasaClassificationResult _classification;
@@ -28,11 +29,13 @@ namespace Framework.Classifier
         /// <param name="serverUrl">The url to the rasa server e.g. 'http://localhost'.</param>
         /// <param name="port">The port to access to the rasa server.</param>
         /// <param name="logger">The logger (optional)</param>
-        public RasaClassifier(string serverUrl, int port = 5005, ILogger logger = null)
+        /// <param name="minEntityConfidence">the minimum confidence of an entity</param>
+        public RasaClassifier(string serverUrl, int port = 5005, ILogger logger = null, double minEntityConfidence = 0.9)
         {
             _logger = logger;
             _serverUrl = serverUrl + ":" + port;
             _client = new HttpClient { BaseAddress = new Uri(_serverUrl), Timeout = new TimeSpan(0, 0, 20) };
+            _minEntityConfidence = minEntityConfidence;
             var status = _client.GetAsync("/status").GetAwaiter().GetResult();
             if (!status.IsSuccessStatusCode)
                 throw new ArgumentException("RASA server does not respond. Did you used the --enable-api flag when starting the rasa server?");
@@ -47,8 +50,20 @@ namespace Framework.Classifier
             foreach (var score in _classification.IntentRanking)
                 scoring.Add(score.Name, score.Score);
 
-            ClassifierResult result = new ClassifierResult(_classification.Text, scoring, new Dictionary<string, List<IEntity>>());
+            Dictionary<string, List<IEntity>> entities = new Dictionary<string, List<IEntity>>();
+            foreach (var entity in _classification.Entities)
+                if (entity.Score >= _minEntityConfidence)
+                    AddEntity(entities, entity.Group, new GroupEntity(_classification.Text.Substring(entity.Start, entity.End - entity.Start), entity.Start, entity.End, entity.Group, entity.Value));
+
+            ClassifierResult result = new ClassifierResult(_classification.Text, scoring, entities);
             return result;
+        }
+        private void AddEntity(Dictionary<string, List<IEntity>> entities, string key, IEntity entity)
+        {
+            if (entities.ContainsKey(key))
+                entities[key].Add(entity);
+            else
+                entities.Add(key, new List<IEntity> { entity });
         }
 
         public async Task Recognize(ITurnContext context, CancellationToken cancellationToken)
@@ -72,7 +87,6 @@ namespace Framework.Classifier
         }
 
 
-        [Serializable]
         private class RasaClassificationResult
         {
             [JsonProperty("intent")]
@@ -81,9 +95,25 @@ namespace Framework.Classifier
             public List<RasaIntent> IntentRanking { get; set; }
             [JsonProperty("text")]
             public string Text { get; set; }
+            [JsonProperty("entities")]
+            public List<RasaEntity> Entities { get; set; }
         }
 
-        [Serializable]
+        private class RasaEntity
+        {
+            [JsonProperty("entity")]
+            public string Group { get; set; }
+            [JsonProperty("value")]
+            public string Value { get; set; }
+            [JsonProperty("confidence")]
+            public double Score { get; set; }
+
+            [JsonProperty("start")]
+            public int Start { get; set; }
+            [JsonProperty("end")]
+            public int End { get; set; }
+        }
+
         private class RasaIntent
         {
             [JsonProperty("name")]
