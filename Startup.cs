@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Framework.Controller;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Extensions.Configuration;
@@ -25,11 +25,18 @@ namespace Framework
         protected bool _isProduction = false;
 
         /// <summary>
+        /// Indicator to use SignalR. Default endpoint is "/receiverhub".
+        /// </summary>
+        protected bool _useSignalR;
+
+        /// <summary>
         /// Starts the bot in the environment.
         /// </summary>
         /// <param name="env">The hosting environment.</param>
-        public Startup(IWebHostEnvironment env)
+        /// <param name="useSignalR">Indicator to use SignalR. Default endpoint is "/receiverhub".</param>
+        public Startup(IWebHostEnvironment env, bool useSignalR = false)
         {
+            _useSignalR = useSignalR;
             _isProduction = env.IsProduction();
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -65,6 +72,7 @@ namespace Framework
             services.AddSingleton<IStorage, MemoryStorage>();
             // Create the Conversation state. (Used by the Dialog system itself.)
             services.AddSingleton<ConversationState>();
+            if (_useSignalR) services.AddSignalR();
         }
 
         /// <summary>
@@ -90,6 +98,7 @@ namespace Framework
                 .UseEndpoints(endpoints =>
                 {
                     endpoints.MapControllers();
+                    if (_useSignalR) endpoints.MapHub<OfflineHub>("/receiverhub");
                 });
 
             // app.UseHttpsRedirection();
