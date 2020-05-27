@@ -53,7 +53,7 @@ namespace Framework.Classifier
             Dictionary<string, List<IEntity>> entities = new Dictionary<string, List<IEntity>>();
             foreach (var entity in _classification.Entities)
                 if (entity.Score >= _minEntityConfidence)
-                    AddEntity(entities, entity.Group, new GroupEntity(_classification.Text.Substring(entity.Start, entity.End - entity.Start), entity.Start, entity.End, entity.Group, entity.Value));
+                    AddEntity(entities, entity.Group, new GroupEntity(_classification.Text.Substring(entity.Start, entity.End - entity.Start), entity.Start, entity.End, entity.Group, entity.Value, entity.Score));
 
             ClassifierResult result = new ClassifierResult(_classification.Text, scoring, entities);
             return result;

@@ -99,6 +99,10 @@ namespace Framework.Classifier
         /// Type of the found entity.
         /// </summary>
         EntityType EType { get; }
+        /// <summary>
+        /// Confidence of the found entity.
+        /// </summary>
+        double Confidence { get; }
     }
 
     /// <summary>
@@ -131,18 +135,21 @@ namespace Framework.Classifier
         /// <param name="endIndex">The end index of the snippet.</param>
         /// <param name="group">The associated group.</param>
         /// <param name="shape">Defines the shape.</param>
-        public GroupEntity(string text, int startIndex, int endIndex, string group, string shape)
+        /// <param name="confidence">Confidence of the entity.</param>
+        public GroupEntity(string text, int startIndex, int endIndex, string group, string shape, double confidence=1)
         {
             Text = text;
             StartIndex = startIndex;
             EndIndex = endIndex;
             Group = group;
             Shape = shape;
+            Confidence = confidence;
         }
         
         public string Text { get; }
         public int StartIndex { get; }
         public int EndIndex { get; }
+        public double Confidence { get; }
 
         /// <summary>
         /// The name of the group.
@@ -168,17 +175,20 @@ namespace Framework.Classifier
         /// <param name="startIndex">The start index of the snippet.</param>
         /// <param name="endIndex">The end index of the snippet.</param>
         /// <param name="times">Datetimes associated with the datetime results.</param>
-        public TimeEntity(string text, int startIndex, int endIndex, List<DateTime> times)
+        /// <param name="confidence">Confidence of the entity.</param>
+        public TimeEntity(string text, int startIndex, int endIndex, List<DateTime> times, double confidence=1)
         {
             Text = text;
             StartIndex = startIndex;
             EndIndex = endIndex;
             Times = times;
+            Confidence = confidence;
         }
 
         public string Text { get; }
         public int StartIndex { get; }
         public int EndIndex { get; }
+        public double Confidence { get; }
         /// <summary>
         /// The found datetimes.
         /// </summary>
