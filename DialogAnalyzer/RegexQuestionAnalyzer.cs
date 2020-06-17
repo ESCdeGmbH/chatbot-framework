@@ -1,5 +1,6 @@
 ﻿using Framework.Misc;
 using Microsoft.Bot.Builder;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,16 @@ namespace Framework.DialogAnalyzer
     {
         private List<Tuple<QuestionType, double>> _result;
 
+        private static readonly Dictionary<Language, string> Maps = new Dictionary<Language, string> {
+            { Language.English, "EN" },
+            { Language.Deutsch, "DE" }
+        };
+
         private static readonly List<Language> Configs = new List<Language> {
             Language.Deutsch
         };
+
+        private Dictionary<string, List<string>> _map;
 
         /// <summary>
         /// Creates the analyzer.
@@ -24,6 +32,7 @@ namespace Framework.DialogAnalyzer
         {
             if (!Configs.Contains(lang))
                 throw new ArgumentException("Your Language is not supported.");
+            _map = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(MiscExtensions.LoadEmbeddedResource($"Framework.DialogAnalyzer.QuestionTypes_{Maps[lang]}.json"));
         }
         public override Task<List<Tuple<QuestionType, double>>> GetQuestionTypes()
         {
@@ -33,34 +42,55 @@ namespace Framework.DialogAnalyzer
         public override void Recognize(ITurnContext turnContext)
         {
             _result = new List<Tuple<QuestionType, double>>();
-            string text = turnContext.Activity.Text.ToLower();
+            string text = turnContext.Activity.Text?.ToLower();
+            if (text == null)
+            {
+                _result = null;
+                return;
+            }
 
-            List<string> how = new List<string> { "wie" };
-            List<string> howLong = new List<string> { "wie lange", "wie lang", "wie viele stunden", "wie viele tage", "wie viele minuten", "wieviele stunden", "wieviele tage", "wieviele minuten" };
-            List<string> howMany = new List<string> { "wie viele", "wie viel", "wieviele", "wieviel" };
-            List<string> what = new List<string> { "was", "welche", "welcher", "welches", "welchen", "was für ein", "was für eine", "welchem", "wofür", "als was" };
-            List<string> when = new List<string> { "wann", "welche zeit", "welcher zeit", "um welche zeit", "zu welcher zeit", "um wieviel uhr", "wieviel uhr", "zu welcher uhrzeit" };
-            List<string> where = new List<string> { "wo", "wohin", "woher", "von wo", "an welchem ort" };
-            List<string> who = new List<string> { "wer", "wem", "wessen", "wen" };
-            List<string> why = new List<string> { "warum", "weshalb", "wieso", "weswegen", "wozu" };
+            CheckStart(_result, text, QuestionType.When);
+            CheckContains(_result, text, QuestionType.When);
 
-            
-            if (when.Any(h => text.StartsWith($"{h} ")) || text.Contains(" uhr "))
-                _result.Add(new Tuple<QuestionType, double>(QuestionType.When, 1));
-            else if (where.Any(h => text.StartsWith($"{h} ")) || text.Contains(" ort "))
-                _result.Add(new Tuple<QuestionType, double>(QuestionType.Where, 1));
-            else if (who.Any(h => text.StartsWith($"{h} ")) || text.Contains(" person "))
-                _result.Add(new Tuple<QuestionType, double>(QuestionType.Who, 1));
-            else if (howLong.Any(h => text.StartsWith($"{h} ")))
-                _result.Add(new Tuple<QuestionType, double>(QuestionType.HowLong, 1));
-            else if (howMany.Any(h => text.StartsWith($"{h} ")))
-                _result.Add(new Tuple<QuestionType, double>(QuestionType.HowMany, 1));
-            else if (how.Any(h => text.StartsWith($"{h} ")))
-                _result.Add(new Tuple<QuestionType, double>(QuestionType.How, 1));
-            else if (why.Any(h => text.StartsWith($"{h} ")) || text.Contains(" grund ") || text.Contains(" zweck "))
-                _result.Add(new Tuple<QuestionType, double>(QuestionType.Why, 1));
-            else if (what.Any(h => text.StartsWith($"{h} ")))
-                _result.Add(new Tuple<QuestionType, double>(QuestionType.What, 1));
+            CheckStart(_result, text, QuestionType.Where);
+            CheckContains(_result, text, QuestionType.Where);
+
+            CheckStart(_result, text, QuestionType.Who);
+            CheckContains(_result, text, QuestionType.Who);
+
+            CheckStart(_result, text, QuestionType.HowLong);
+
+            CheckStart(_result, text, QuestionType.HowMany);
+
+            CheckStart(_result, text, QuestionType.How);
+            CheckContains(_result, text, QuestionType.How);
+
+            CheckStart(_result, text, QuestionType.What);
+        }
+
+        private void CheckStart(List<Tuple<QuestionType, double>> result, string text, QuestionType question)
+        {
+            if (result.Any())
+                return;
+            string key = Enum.GetName(typeof(QuestionType), question).ToLower();
+            if (!_map.ContainsKey(key))
+                return;
+            var vals = _map[key];
+            if (vals.Any(h => text.StartsWith($"{h }")))
+                result.Add(new Tuple<QuestionType, double>(question, 1));
+        }
+
+
+        private void CheckContains(List<Tuple<QuestionType, double>> result, string text, QuestionType question)
+        {
+            if (result.Any())
+                return;
+            string key = Enum.GetName(typeof(QuestionType), question).ToLower() + "_contains";
+            if (!_map.ContainsKey(key))
+                return;
+            var vals = _map[key];
+            if (vals.Any(h => text.Contains(h)))
+                result.Add(new Tuple<QuestionType, double>(question, 1));
         }
     }
 }

@@ -1,0 +1,14 @@
+﻿{
+  "how": [ "wie" ],
+  "howLong": [ "wie lange", "wie lang", "wie viele stunden", "wie viele tage", "wie viele minuten", "wieviele stunden", "wieviele tage", "wieviele minuten" ],
+  "howMany": [ "wie viele", "wie viel", "wieviele", "wieviel" ],
+  "what": [ "was", "welche", "welcher", "welches", "welchen", "was für ein", "was für eine", "welchem", "wofür", "als was" ],
+  "when": [ "wann", "welche zeit", "welcher zeit", "um welche zeit", "zu welcher zeit", "um wieviel uhr", "wieviel uhr", "zu welcher uhrzeit" ],
+  "when_contains": [ " uhr " ],
+  "where": [ "wo", "wohin", "woher", "von wo", "an welchem ort" ],
+  "where_contains": [ " ort " ],
+  "who": [ "wer", "wem", "wessen", "wen" ],
+  "who_contains": [ " person " ],
+  "why": [ "warum", "weshalb", "wieso", "weswegen", "wozu" ],
+  "why_contains": [ " grund ", " zweck " ]
+}

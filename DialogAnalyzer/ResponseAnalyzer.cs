@@ -22,9 +22,9 @@ namespace Framework.DialogAnalyzer
     /// </summary>
     public sealed class ResponseAnalyzer
     {
-        private readonly LuisRecognizer _classifier;
+        private readonly IClassifier _classifier;
         private readonly double _threshold;
-        private Task<RecognizerResult> _classification;
+        private Task _classification;
         private string _response;
 
         private readonly List<string> _blackList;
@@ -39,22 +39,13 @@ namespace Framework.DialogAnalyzer
         /// <summary>
         /// Creates the analyzer.
         /// </summary>
-        /// <param name="config">The configuration of the bot</param>
         /// <param name="lang">Defines the language.</param>
         /// <param name="threshold">The default threshold for Luis classification.</param>
-        /// <exception cref="ArgumentException">unsupported language.</exception>
-        public ResponseAnalyzer(IConfiguration config, Language lang, double threshold)
+        /// <param name="classifier">The classifier we shall use, may be null iff you do not wanna use all methods.</param>
+        public ResponseAnalyzer(Language lang, double threshold, IClassifier classifier)
         {
-            if (!Configs.ContainsKey(lang))
-                throw new ArgumentException("Your Language is not supported.");
-
             _blackList = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(BlackListRawData)[Configs[lang]];
-
-            var map = config.GetSection("ResponseAnalyzer").GetSection(Configs[lang]).Get<Dictionary<string, object>>();
-            LuisServiceDefinition lsd = JsonConvert.DeserializeObject<LuisServiceDefinition>(JsonConvert.SerializeObject(map));
-            _classifier = new LuisRecognizer(
-                new LuisRecognizerOptionsV2(new LuisApplication(lsd.GetLuisService())) { PredictionOptions = lsd.GetPredictOpts() }
-            );
+            _classifier = classifier;
             _threshold = threshold;
         }
 
@@ -65,8 +56,10 @@ namespace Framework.DialogAnalyzer
         /// <param name="turnContext">The bot context with input.</param>
         public void Recognize(ITurnContext turnContext)
         {
+            if (_classifier == null)
+                return;
             _response = turnContext.Activity.Text;
-            _classification = _classifier.RecognizeAsync(turnContext, default(CancellationToken));
+            _classification = _classifier.Recognize(turnContext, default(CancellationToken));
         }
 
         /// <summary>
@@ -75,14 +68,17 @@ namespace Framework.DialogAnalyzer
         /// <returns>Null, true or false.</returns>
         public async Task<bool?> IsYesOrNo()
         {
-            var classification = await _classification;
-            double? score = classification.Intents["YesOrNo"].Score;
+            if (_classifier == null)
+                return null;
+            await _classification;
+            var classification = _classifier.GetResult();
+            double? score = (classification.Intents.ContainsKey("YesOrNo") ? classification.Intents["YesOrNo"] : (double?)null);
             if (score == null || score < _threshold)
             {
                 return null;
             }
 
-            if (!classification.Entities.GetEntities(false).TryGetValue("Indicator", out List<JToken> indicators))
+            if (!classification.Entities.TryGetValue("Indicator", out List<IEntity> indicators))
             {
                 // No indicators
                 return null;
@@ -92,7 +88,7 @@ namespace Framework.DialogAnalyzer
                 // Ambigous indicators
                 return null;
             }
-            return indicators[0].ToObject<string[]>()[0] == "yes";
+            return ((GroupEntity)indicators[0]).Shape == "yes";
         }
 
         /// <summary>
@@ -101,8 +97,10 @@ namespace Framework.DialogAnalyzer
         /// <returns>The indicator.</returns>
         public async Task<bool> IsCancel()
         {
-            var classification = await _classification;
-            return classification.Intents["Cancel"].Score >= _threshold;
+            if (_classifier == null)
+                return false;
+            await _classification;
+            return _classifier.GetResult().Intents["Cancel"] >= _threshold;
         }
 
 
