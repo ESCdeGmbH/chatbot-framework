@@ -34,11 +34,11 @@
     <PackageReference Include="AdaptiveCards" Version="1.2.4" />
     <PackageReference Include="FuzzyString.NETStandard" Version="1.0.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.14.0" />
-	  <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.5" />
-    <PackageReference Include="Microsoft.Bot.Builder" Version="4.9.3" />
-    <PackageReference Include="Microsoft.Bot.Builder.AI.Luis" Version="4.9.3" />
-    <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.9.3" />
-    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.9.3" />
+	  <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Bot.Builder" Version="4.9.4" />
+    <PackageReference Include="Microsoft.Bot.Builder.AI.Luis" Version="4.9.4" />
+    <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.9.4" />
+    <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.9.4" />
     <PackageReference Include="Microsoft.Graph" Version="3.8.0" />
   </ItemGroup>
 
