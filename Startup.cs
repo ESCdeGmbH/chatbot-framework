@@ -72,7 +72,8 @@ namespace Framework
         /// Configures the services with default parameters.
         /// </summary>
         /// <param name="services">the services of this bot</param>
-        protected void ConfigureDefaultServices(IServiceCollection services) {
+        protected void ConfigureDefaultServices(IServiceCollection services)
+        {
             services.AddControllers().AddNewtonsoftJson();
             services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
 
@@ -88,10 +89,11 @@ namespace Framework
         /// </summary>
         /// <param name="services">the services of this bot</param>
         /// <param name="specificAdapterInstance">the specific adapter instance</param>
-        protected void ConfigureDefaultServices(IServiceCollection services, IBotFrameworkHttpAdapter specificAdapterInstance)
+        /// <typeparam name="A">the type of the <see cref="IBotFrameworkHttpAdapter"/></typeparam>
+        protected void ConfigureDefaultServicesByFrameworkAdapter<A>(IServiceCollection services) where A : class, IBotFrameworkHttpAdapter
         {
             services.AddControllers().AddNewtonsoftJson();
-            services.AddSingleton<IBotFrameworkHttpAdapter>(specificAdapterInstance);
+            services.AddSingleton<IBotFrameworkHttpAdapter, A>();
 
             // Create the storage we'll be using for User and Conversation state. (Memory is great for testing purposes.)
             services.AddSingleton<IStorage, MemoryStorage>();
