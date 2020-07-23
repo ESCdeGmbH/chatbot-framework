@@ -56,7 +56,7 @@ namespace Framework
         public IConfiguration Configuration { get; }
 
         /// <summary>
-        /// This method gets called by the runtime. Use this method to add services to the container.
+        /// This method gets called by the runtime. Use this method to add services to the container. By default this will invoke <see cref="ConfigureDefaultServices(IServiceCollection)"/>
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> specifies the contract for a collection of service descriptors.</param>
         /// <seealso cref="IStatePropertyAccessor{T}"/>
@@ -65,8 +65,33 @@ namespace Framework
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
+            ConfigureDefaultServices(services);
+        }
+
+        /// <summary>
+        /// Configures the services with default parameters.
+        /// </summary>
+        /// <param name="services">the services of this bot</param>
+        protected void ConfigureDefaultServices(IServiceCollection services) {
             services.AddControllers().AddNewtonsoftJson();
             services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
+
+            // Create the storage we'll be using for User and Conversation state. (Memory is great for testing purposes.)
+            services.AddSingleton<IStorage, MemoryStorage>();
+            // Create the Conversation state. (Used by the Dialog system itself.)
+            services.AddSingleton<ConversationState>();
+            if (_useSignalR) services.AddSignalR();
+        }
+
+        /// <summary>
+        /// Same as <see cref="ConfigureDefaultServices(IServiceCollection)"/> but use a specific bot framework adapter instance
+        /// </summary>
+        /// <param name="services">the services of this bot</param>
+        /// <param name="specificAdapterInstance">the specific adapter instance</param>
+        protected void ConfigureDefaultServices(IServiceCollection services, IBotFrameworkHttpAdapter specificAdapterInstance)
+        {
+            services.AddControllers().AddNewtonsoftJson();
+            services.AddSingleton<IBotFrameworkHttpAdapter>(specificAdapterInstance);
 
             // Create the storage we'll be using for User and Conversation state. (Memory is great for testing purposes.)
             services.AddSingleton<IStorage, MemoryStorage>();
@@ -101,7 +126,6 @@ namespace Framework
                     if (_useSignalR) endpoints.MapHub<OfflineHub>("/receiverhub");
                 });
 
-            // app.UseHttpsRedirection();
         }
     }
 }
