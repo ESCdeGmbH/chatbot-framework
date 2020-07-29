@@ -62,27 +62,14 @@ namespace Framework
         /// <seealso cref="IStatePropertyAccessor{T}"/>
         /// <seealso cref="https://docs.microsoft.com/en-us/aspnet/web-api/overview/advanced/dependency-injection"/>
         /// <seealso cref="https://docs.microsoft.com/en-us/azure/bot-service/bot-service-manage-channels?view=azure-bot-service-4.0"/>
-
-        public virtual void ConfigureServices(IServiceCollection services)
-        {
-            ConfigureDefaultServices(services);
-        }
+        public virtual void ConfigureServices(IServiceCollection services) => ConfigureDefaultServices(services);
 
         /// <summary>
         /// Configures the services with default parameters.
         /// </summary>
         /// <param name="services">the services of this bot</param>
-        protected void ConfigureDefaultServices(IServiceCollection services)
-        {
-            services.AddControllers().AddNewtonsoftJson();
-            services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
+        protected void ConfigureDefaultServices(IServiceCollection services) => ConfigureDefaultServicesByFrameworkAdapter<AdapterWithErrorHandler>(services);
 
-            // Create the storage we'll be using for User and Conversation state. (Memory is great for testing purposes.)
-            services.AddSingleton<IStorage, MemoryStorage>();
-            // Create the Conversation state. (Used by the Dialog system itself.)
-            services.AddSingleton<ConversationState>();
-            if (_useSignalR) services.AddSignalR();
-        }
 
         /// <summary>
         /// Same as <see cref="ConfigureDefaultServices(IServiceCollection)"/> but use a specific bot framework adapter instance
